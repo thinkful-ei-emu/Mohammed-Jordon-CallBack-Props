@@ -3,23 +3,7 @@ import List from './List'
 import './App.css';
 import STORE from './STORE';
 
-const newRandomCard = () => {
-  const id = Math.random().toString(36).substring(2, 4)
-    + Math.random().toString(36).substring(2, 4);
-  return {
-    id,
-    title: `Random Card ${id}`,
-    content: 'lorem ipsum',
-  }
-}
 
-function omit(obj, keyToOmit) {
-  return Object.entries(obj).reduce(
-    (newObj, [key, value]) =>
-      key === keyToOmit ? newObj : { ...newObj, [key]: value },
-    {}
-  );
-}
 
 class App extends Component {
   static defaultProps = {
@@ -34,25 +18,72 @@ class App extends Component {
   }
 
 
-  handleDeleteCard = (cardId) => {
-    const cardToDelete = omit(this.state.store.allCards, cardId);
 
-    const newList = this.lists.map(list => {
-      list.cardIds.filter(id => id === cardId)
+  handleDeleteCard = (cardId, listId) => {
+    function omit(obj, keyToOmit) {
+      return Object.entries(obj).reduce(
+        (newObj, [key, value]) =>
+          key === keyToOmit ? newObj : { ...newObj, [key]: value },
+        {}
+      );
+    }
+
+    // console.log(listId);
+    // console.log(cardId);
+    // console.log(this.state.store);
+    // console.log('handle delete card called', { cardId });
+
+    const lists = this.state.store.lists;
+    let allCards = { ...this.state.store.allCards };
+
+    const newLists = lists.map(list => {
+      list.cardIds = list.cardIds.filter(id => { return id !== cardId })
+      return list;
     });
 
+    const cardsNotRemoved = omit(allCards, cardId);
 
-
-    console.log('handle delete card called', { cardId });
+    this.setState(
+      {
+        store: {
+          lists: newLists,
+          allCards: cardsNotRemoved,
+        }
+      }
+    )
 
   }
 
   handleRandomCard(listId) {
-    console.log('handle random card called');
+    
+    const lists = this.state.store.lists;
+
+    const newRandomCard = () => {
+      const id = Math.random().toString(36).substring(2, 4)
+        + Math.random().toString(36).substring(2, 4);
+      return {
+        id,
+        title: `Random Card ${id}`,
+        content: 'lorem ipsum',
+      }
+    }
+
     const newCard = newRandomCard();
+    console.log(newCard);
 
+    const newAllCards = {
+      ...this.state.allCards,
+      [newCard.id]: newCard
+    }
 
+    this.setState(
+      {
+        lists,
+        allCards: newAllCards
+      }
+    )
 
+    
   }
 
 
@@ -69,7 +100,7 @@ class App extends Component {
           {store.lists.map(list => (
             <List
               key={list.id}
-              cardId={list.id}
+              listId={list.id}
               header={list.header}
               cards={list.cardIds.map(id => store.allCards[id])}
               onDeleteCard={this.handleDeleteCard}
