@@ -13,6 +13,14 @@ const newRandomCard = () => {
   }
 }
 
+function omit(obj, keyToOmit) {
+  return Object.entries(obj).reduce(
+    (newObj, [key, value]) =>
+      key === keyToOmit ? newObj : { ...newObj, [key]: value },
+    {}
+  );
+}
+
 class App extends Component {
   static defaultProps = {
     store: {
@@ -25,12 +33,17 @@ class App extends Component {
     store: STORE,
   }
 
-  deleteCard(cardId) {
 
-  }
+  handleDeleteCard = (cardId) => {
+    const cardToDelete = omit(this.state.store.allCards, cardId);
 
-  handleDeleteCard(card) {
-    console.log('handle delete card called', { card });
+    const newList = this.lists.map(list => {
+      list.cardIds.filter(id => id === cardId)
+    });
+
+
+
+    console.log('handle delete card called', { cardId });
 
   }
 
