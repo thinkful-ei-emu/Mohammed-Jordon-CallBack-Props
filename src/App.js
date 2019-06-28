@@ -6,6 +6,10 @@ import STORE from './STORE';
 
 
 class App extends Component {
+  // constructor(props){
+  //   super(props);
+  //   this.handleRandomCard = this.handleRandomCard.bind(this);
+  // }
   static defaultProps = {
     store: {
       lists: [],
@@ -17,8 +21,6 @@ class App extends Component {
     store: STORE,
   }
 
-
-
   handleDeleteCard = (cardId, listId) => {
     function omit(obj, keyToOmit) {
       return Object.entries(obj).reduce(
@@ -27,11 +29,6 @@ class App extends Component {
         {}
       );
     }
-
-    // console.log(listId);
-    // console.log(cardId);
-    // console.log(this.state.store);
-    // console.log('handle delete card called', { cardId });
 
     const lists = this.state.store.lists;
     let allCards = { ...this.state.store.allCards };
@@ -54,7 +51,7 @@ class App extends Component {
 
   }
 
-  handleRandomCard(listId) {    
+  handleRandomCard = (listId) =>{    
     //const lists = this.state.store.lists;   
 
     const newRandomCard = () => {
@@ -68,34 +65,36 @@ class App extends Component {
     }
 
     const newCard = newRandomCard();
-    //console.log(newCard);
-    const newList = this.state.store.lists.map(item => {
-      console.log(item);
-      if(item.id === listId){
-        item.cardIds = [...item.cardIds, newCard.id]
+    const newList = this.state.store.lists.map(list => {
+      if(list.id === listId){
+        return{
+          id:list.id,
+          header: list.header,
+          cardIds:[...list.cardIds, newCard.id]
+        }        
       }
+      return list;
     })
-
+    // console.log(listId);
+    // console.log(newList);
     const newAllCards = {
-      ...this.state.allCards,
-      [newCard.id]: newCard
+      ...this.state.store.allCards,      
     }
-
+    newAllCards[newCard.id]= newCard
     this.setState(
       {
-        list:newList,
-        allCards: newAllCards
-      }
-    )
-
-    
+        store:{
+          lists:newList,
+          allCards: newAllCards
+        }
+      },()=>console.log(this.state))    
   }
 
 
 
 
   render() {
-    const { store } = this.props
+    const  store = this.state.store;
     return (
       <main className='App'>
         <header className='App-header'>
